@@ -194,6 +194,7 @@ export class DocumentSearchStack extends Stack {
     documentStorageBucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
       new s3n.LambdaDestination(processZipFiles),{
+      prefix: "zip/",
       suffix: '.zip'
       }
     );

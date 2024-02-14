@@ -1,1 +1,22 @@
-{}
+{
+  "opportunity-document-search-stack": {
+    "searchdocumentapiendpointregion": "us-east-1",
+    "editdocumentapiendpointregion": "us-east-1",
+    "ExportsOutputRefopportunitysearchdocumentapidevuseast161F3C6CFAA62202E": "d144u2wwe0",
+    "opportunityeditdocumentapidevuseast1EndpointB129D018": "https://xlkpet4ukg.execute-api.us-east-1.amazonaws.com/prod/",
+    "opportunitysearchdocumentapidevuseast1EndpointE8F5C5F3": "https://d144u2wwe0.execute-api.us-east-1.amazonaws.com/prod/",
+    "ExportsOutputRefopportunitysearchdocumentapidevuseast1DeploymentStageprod9846AE7F47E222AE": "prod",
+    "documentbucketname": "opportunityhack9465749864541541",
+    "searchdocumentapiendpoint": "https://d144u2wwe0.execute-api.us-east-1.amazonaws.com/prod/",
+    "editdocumentapiendpoint": "https://xlkpet4ukg.execute-api.us-east-1.amazonaws.com/prod/",
+    "documentbucketregion": "us-east-1"
+  },
+  "opportunity-amplify-stack": {
+    "awsuserpoolsid": "us-east-1_6bxhgLMRS",
+    "amplifyappid": "d2jqhrwlgq2ppi",
+    "awsprojectregion": "us-east-1",
+    "awscognitoregion": "us-east-1",
+    "awsuserpoolswebclientid": "99npvdqs3shlq0l2it3o27dcp",
+    "awscognitoidentitypoolid": "us-east-1:ff88a4c9-4905-4e3b-a308-66817478b091"
+  }
+}
