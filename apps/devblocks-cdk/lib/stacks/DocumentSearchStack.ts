@@ -25,8 +25,8 @@ export class DocumentSearchStack extends Stack {
     super(scope, id, props);
 
     // S3 Storage bucket where all documents will be stored.
-    const documentStorageBucket = new aws_s3.Bucket(this, props.documentSearchStackConfiguration.documentStorageBucketName, {
-      bucketName: props.documentSearchStackConfiguration.documentStorageBucketName,
+    const documentStorageBucket = new aws_s3.Bucket(this, "opportunityhack9465749864541541", {
+      bucketName: "opportunityhack9465749864541541",
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       eventBridgeEnabled: true,
@@ -167,7 +167,7 @@ export class DocumentSearchStack extends Stack {
     // ====================================================================================================
     const processZipFiles = new lambda.Function(this, "document-search-process-zip-files", {
       runtime: lambda.Runtime.PYTHON_3_10,
-      code: lambda.Code.fromAsset("lambda"),
+      code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
       handler: "bulkprocessing.handler",
       timeout: Duration.minutes(15),
       environment: {
