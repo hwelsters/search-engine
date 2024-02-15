@@ -5,6 +5,7 @@
     "ExportsOutputRefopportunitysearchdocumentapidevuseast161F3C6CFAA62202E": "720994jebj",
     "opportunityeditdocumentapidevuseast1EndpointB129D018": "https://gqrloedyul.execute-api.us-east-1.amazonaws.com/prod/",
     "opportunitysearchdocumentapidevuseast1EndpointE8F5C5F3": "https://720994jebj.execute-api.us-east-1.amazonaws.com/prod/",
+    "dpreservesearchgetobjectpreSignedURLAPIEndpointC43B43B3": "https://pql60ui5r2.execute-api.us-east-1.amazonaws.com/prod/",
     "ExportsOutputRefopportunitysearchdocumentapidevuseast1DeploymentStageprod9846AE7F47E222AE": "prod",
     "documentbucketname": "opportunityhack9465749864541541",
     "searchdocumentapiendpoint": "https://720994jebj.execute-api.us-east-1.amazonaws.com/prod/",

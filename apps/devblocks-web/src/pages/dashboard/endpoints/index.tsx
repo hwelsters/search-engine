@@ -1,8 +1,8 @@
 /* eslint no-underscore-dangle: "off" */
 
-import { CalendarMonth, Close, CloseRounded, Edit, EditNote, List, LocationOn, Tag, Title } from "@mui/icons-material";
+import { CalendarMonth, Close, CloseRounded, Edit, EditNote, Key, List, LocationOn, Tag, Title } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
-import { API, Auth, Storage } from "aws-amplify";
+import { API, Auth, Storage, getUrl} from "aws-amplify";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -99,7 +99,8 @@ export default function DashboardKeys() {
   // usage
   async function download(objectKey: string) {
     try {
-      const result = await Storage.get(objectKey, { download: true, region: "us-west-2", expires: 3600 });
+      const result = await Storage.get(objectKey, { download: false, region: "us-east-1", expires: 3600 });
+
       console.log(result);
       downloadBlob(result.Body, objectKey);
     } catch (e) {

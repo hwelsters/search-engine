@@ -10,6 +10,9 @@ import type { Construct } from "constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as api_gateway from 'aws-cdk-lib/aws-apigateway';
+import * as logs from 'aws-cdk-lib/aws-logs';
+import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 
 export class DocumentSearchStack extends Stack {
   readonly searchDocumentEndpoint: string;
@@ -198,6 +201,58 @@ export class DocumentSearchStack extends Stack {
       suffix: '.zip'
       }
     );
+
+    // Lambda function to upload data to S3 bucket uasing presigned URL from the Backup bucket
+    const preserve_search_upload_presigned_url = new lambda.Function(this, "preserve_search_get_object_presignedURL", {
+      runtime: lambda.Runtime.PYTHON_3_10,
+      code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
+      handler: "getSignedURL.handler",
+      environment: {
+        "BUCKET_NAME": documentStorageBucket.bucketName
+        }
+      }
+    )
+
+    preserve_search_upload_presigned_url.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          "logs:*",
+          "apigateway:*",
+          "s3:*",
+          "dynamodb:*",
+        ],
+        resources: ["*"],
+      })
+    )
+
+    // API to get the presigned URL
+    const get_preSignedURL_API = new api_gateway.RestApi(this, 'dpreserve_search_get_object_preSignedURL_API', {
+      cloudWatchRole: true,
+      deployOptions:{
+        accessLogDestination: new api_gateway.LogGroupLogDestination(new logs.LogGroup(this, "preserve_search_get_object_preSignedURL_api_log_group", {
+          logGroupName: "preserve_search_get_object_preSignedURL_api_log_group",
+          retention: RetentionDays.ONE_MONTH,
+          removalPolicy: RemovalPolicy.DESTROY,
+        })),
+      },
+      defaultCorsPreflightOptions: {
+        allowHeaders: [
+          '*',
+        ],
+        allowOrigins: api_gateway.Cors.ALL_ORIGINS,
+        allowMethods: api_gateway.Cors.ALL_METHODS
+      }
+    })
+
+    // get_presigned_URL integration
+    const get_preSignedURL_integration = new api_gateway.LambdaIntegration(preserve_search_upload_presigned_url);
+
+    // declaring the resource and then adding method 
+    const get_preSignedURL_api_path = get_preSignedURL_API.root.addResource('getSignedObjectUrl')
+
+    // adding post method
+    get_preSignedURL_api_path.addMethod("POST", get_preSignedURL_integration)
 
     // ====================================================================================================
     // Lambda function for deleting documents
