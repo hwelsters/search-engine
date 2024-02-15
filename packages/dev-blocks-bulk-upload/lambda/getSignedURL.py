@@ -21,6 +21,17 @@ def handler(event, context):
     print(object_Id)
     print(type(object_Id))
     
+    file_extension = object_Id.split(".")[1]
+    print(file_extension)
+    
+    if file_extension == "zip":
+        object_Id = "zip/" + object_Id
+        print(object_Id)
+    else:
+        object_Id = "public/" + object_Id
+        print(object_Id)
+    
+    
     pre_response_val = s3_client.generate_presigned_post(
         Bucket = bucket_name,
         Key = object_Id,
