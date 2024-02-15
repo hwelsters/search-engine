@@ -21,18 +21,21 @@ def handler(event, context):
     print(object_Id)
     print(type(object_Id))
     
-    pre_response_val = s3_client.generate_presigned_post(
-        Bucket = bucket_name,
-        Key = object_Id,
+    pre_response_val_get_object = s3_client.generate_presigned_url(
+        'get_object',
+        Params={
+            'Bucket': bucket_name,
+            'Key': object_Id
+            },
         ExpiresIn = 600 
     )
     print("************************************")
-    print(pre_response_val)
+    print(pre_response_val_get_object)
     print("presigned URL to get object Generated")
     print("************************************")
         
         
-    response = buildResponse(pre_response_val)
+    response = buildResponse(pre_response_val_get_object)
         
     print(response)
     

@@ -202,8 +202,12 @@ export class DocumentSearchStack extends Stack {
       }
     );
 
+    // ====================================================================================================
+    // functions to manage upload to the bucket 
+
+    // Upload part
     // Lambda function to upload data to S3 bucket uasing presigned URL from the Backup bucket
-    const preserve_search_upload_presigned_url = new lambda.Function(this, "preserve_search_get_object_presignedURL", {
+    const preserve_search_upload_url = new lambda.Function(this, "preserve_search_get_presignedURL", {
       runtime: lambda.Runtime.PYTHON_3_10,
       code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
       handler: "getSignedURL.handler",
@@ -213,14 +217,37 @@ export class DocumentSearchStack extends Stack {
       }
     )
 
-    preserve_search_upload_presigned_url.addToRolePolicy(
+    preserve_search_upload_url.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          "logs:*",
+          "apigateway:*",
+          "s3:*"
+        ],
+        resources: ["*"],
+      })
+    )
+
+    // Download part
+    // Lambda function to get Object for download to S3 bucket using presigned URL from the bucket
+    const preserve_search_upload_presigned_url_get_object = new lambda.Function(this, "preserve_search_get_object_presignedURL", {
+      runtime: lambda.Runtime.PYTHON_3_10,
+      code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
+      handler: "getObjectSignedURL.handler",
+      environment: {
+        "BUCKET_NAME": documentStorageBucket.bucketName
+        }
+      }
+    )
+
+    preserve_search_upload_presigned_url_get_object.addToRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [
           "logs:*",
           "apigateway:*",
           "s3:*",
-          "dynamodb:*",
         ],
         resources: ["*"],
       })
@@ -245,14 +272,27 @@ export class DocumentSearchStack extends Stack {
       }
     })
 
-    // get_presigned_URL integration
-    const get_preSignedURL_integration = new api_gateway.LambdaIntegration(preserve_search_upload_presigned_url);
+
+    // Download part integrations and methods
+    // get_presigned_URL integration for get object presigned URL
+    const get_preSignedURL_get_object_integration = new api_gateway.LambdaIntegration(preserve_search_upload_presigned_url_get_object);
 
     // declaring the resource and then adding method 
     const get_preSignedURL_api_path = get_preSignedURL_API.root.addResource('getSignedObjectUrl')
 
-    // adding post method
-    get_preSignedURL_api_path.addMethod("POST", get_preSignedURL_integration)
+    // adding post method for get object presigned URL
+    get_preSignedURL_api_path.addMethod("POST", get_preSignedURL_get_object_integration)
+
+
+    // Upload part integrations and methods
+    // get_presigned_URL integration for get object presigned URL
+    const get_preSignedURL_upload_integration = new api_gateway.LambdaIntegration(preserve_search_upload_url);
+
+    // declaring the resource and then adding method 
+    const get_preSignedURL_upload__api_path = get_preSignedURL_API.root.addResource('upload')
+
+    // adding post method for get object presigned URL
+    get_preSignedURL_upload__api_path.addMethod("POST", get_preSignedURL_upload_integration)
 
     // ====================================================================================================
     // Lambda function for deleting documents

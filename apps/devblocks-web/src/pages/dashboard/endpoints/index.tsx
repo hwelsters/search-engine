@@ -17,6 +17,8 @@ import CONFIG from "@/constants/config";
 import TagInput from "@/components/dashboard/endpoints/tag-input";
 import Accordion from "@/components/dashboard/accordion";
 
+const get_presigned_url_download = "https://pql60ui5r2.execute-api.us-east-1.amazonaws.com/prod/getSignedObjectUrl"
+
 export default function DashboardKeys() {
   const router = useRouter();
   const [isSearching, setIsSearching] = useState(false);
