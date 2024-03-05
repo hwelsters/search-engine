@@ -53,10 +53,24 @@ export class DocumentSearchStack extends Stack {
         enabled: false,
       },
       capacity: {
+        masterNodeInstanceType: "t3.small.search",
+        warmInstanceType: "t3.small.search",
+        dataNodeInstanceType: "t3.small.search",
         multiAzWithStandbyEnabled: false,
       },
       removalPolicy: RemovalPolicy.DESTROY,
       tlsSecurityPolicy: aws_opensearchservice.TLSSecurityPolicy.TLS_1_2,
+      // Enable fine-grained access control and configure audit log settings
+      fineGrainedAccessControl: {
+        masterUserName: 'master-user',
+      },
+      // Enable audit logging
+      logging: {
+        auditLogEnabled: true,
+        slowSearchLogEnabled: true,
+        appLogEnabled: true,
+        slowIndexLogEnabled: true,
+      }
     });
 
     // Attach Textract policy to the aws_iam role
@@ -202,7 +216,7 @@ export class DocumentSearchStack extends Stack {
       }
     );
 
-    // ====================================================================================================
+    // ===========================================  Managing Documents Uplaod and download  ===========================================
     // functions to manage upload to the bucket 
 
     // Upload part
