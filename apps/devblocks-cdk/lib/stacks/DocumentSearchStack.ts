@@ -207,6 +207,57 @@ export class DocumentSearchStack extends Stack {
       })
     )
 
+    // ====================================================================================================
+    // Lambda function to get files from the s3 bucket
+    // ====================================================================================================
+    const getFilesFromS3 = new lambda.Function(this, "document-get-files-from-s3", {
+      runtime: lambda.Runtime.PYTHON_3_10,
+      code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
+      handler: "getListObjects.handler",
+      environment: {
+        "BUCKET_NAME": documentStorageBucket.bucketName
+      }
+    })
+
+    documentStorageBucket.grantReadWrite(getFilesFromS3);
+
+    getFilesFromS3.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          "logs:*",
+          "apigateway:*",
+          "s3:*"
+        ],
+        resources: ["*"],
+      })
+    )
+
+    // lambda fucntion for getting the most recent -> 1 log stream event
+    const getRecentLogs = new lambda.Function(this, "document-get-recent-logs", {
+      runtime: lambda.Runtime.PYTHON_3_11,
+      code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
+      handler: "getSearchLogs.handler",
+      timeout: Duration.minutes(5),
+      environment: {
+        "BUCKET_NAME": documentStorageBucket.bucketName
+      }
+    });
+
+    documentStorageBucket.grantReadWrite(getRecentLogs);
+
+    getRecentLogs.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          "logs:*",
+          "apigateway:*",
+          "s3:*"
+        ],
+        resources: ["*"],
+      })
+    )
+
     // adding trigger to the lambda function from s3 trigger 
     documentStorageBucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
@@ -307,6 +358,29 @@ export class DocumentSearchStack extends Stack {
 
     // adding post method for get object presigned URL
     get_preSignedURL_upload__api_path.addMethod("POST", get_preSignedURL_upload_integration)
+
+
+    //  List of Objects
+    // get_presigned_URL integration for list of objects
+    const getFilesFromS3_integration = new api_gateway.LambdaIntegration(getFilesFromS3);
+
+    // declaring the resource and then adding method
+    const getFilesFromS3_api_path = get_preSignedURL_API.root.addResource('listObjects')
+
+    // adding post method for get object presigned URL
+    getFilesFromS3_api_path.addMethod("GET", getFilesFromS3_integration)
+
+
+    //  Recent Logs
+    // get_presigned_URL integration for recent logs
+    const getRecentLogs_integration = new api_gateway.LambdaIntegration(getRecentLogs);
+
+    // declaring the resource and then adding method
+    const getRecentLogs_api_path = get_preSignedURL_API.root.addResource('recentLogs')
+
+    // adding post method for get object presigned URL
+    getRecentLogs_api_path.addMethod("GET", getRecentLogs_integration)
+
 
     // ====================================================================================================
     // Lambda function for deleting documents
