@@ -214,6 +214,7 @@ export class DocumentSearchStack extends Stack {
       runtime: lambda.Runtime.PYTHON_3_10,
       code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
       handler: "getListObjects.handler",
+      timeout: Duration.minutes(5),
       environment: {
         "BUCKET_NAME": documentStorageBucket.bucketName
       }
@@ -239,8 +240,9 @@ export class DocumentSearchStack extends Stack {
       code: aws_lambda.Code.fromAsset(path.join(__dirname, "../../../../packages/dev-blocks-bulk-upload/lambda")),
       handler: "getSearchLogs.handler",
       timeout: Duration.minutes(5),
+      // manually entering the log value
       environment: {
-        "BUCKET_NAME": documentStorageBucket.bucketName
+        "CLOUDWATCH_LOG_NAME": "XXXXXXXXXXXXXXXXXX"
       }
     });
 

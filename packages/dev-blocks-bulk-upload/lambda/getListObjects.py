@@ -3,12 +3,8 @@ import json
 import os
 
 s3_client = boto3.client('s3')
-dynamodb = boto3.resource('dynamodb')
 
 bucket_name = os.environ['BUCKET_NAME']
-table_name = os.environ['TABLE_NAME']
-
-table = dynamodb.Table(table_name)
 
 def handler(event, context):
     
