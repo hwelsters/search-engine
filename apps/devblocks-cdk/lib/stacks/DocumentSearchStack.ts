@@ -254,7 +254,9 @@ export class DocumentSearchStack extends Stack {
         actions: [
           "logs:*",
           "apigateway:*",
-          "s3:*"
+          "s3:*",
+          "logs:*",
+          "cloudwatch:GenerateQuery"
         ],
         resources: ["*"],
       })
